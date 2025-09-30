@@ -247,33 +247,36 @@ class ExperimentManager:
                 try:
                     with open(output_path, 'w', encoding='utf-8') as f:
                         for item in tqdm(inputs, desc=f"Processing prompts for {runner.name}"):
-                            prompt = item.get('prompt', '')
-                            if not prompt:
-                                print(f"Warning: Empty prompt in input: {item}")
-                                continue
-                                
-                            start_time = time.time()
-                            output_text = runner.generate(prompt)
-                            end_time = time.time()
-                            execution_time = end_time - start_time
-                            output_token_count = len(output_text.split())  # 簡易トークン数（単語数）
-                            
+                                # ExperimentManager.run の for item in tqdm(...) 内を以下に差し替え
+                            cycles = self.config.get("cycles", 10)
+                            prompt = item.get("prompt")
+                            history = [{"role": "user", "content": prompt}]
+
+                            for c in range(cycles):
+                                start_time = time.time()
+                                output_text = runner.generate(history)
+                                end_time = time.time()
+                                execution_time = end_time - start_time
+                                output_token_count = len(output_text.split())
+
                             result_entry = {
-                                "input": prompt,
+                                 "id": item.get("id", None),
+                                "cycle": c + 1,
+                                "input": prompt if c == 0 else None,  # 初回のみ元入力を保持
                                 "output": output_text,
                                 "execution_time": execution_time,
                                 "output_token_count": output_token_count,
                                 "parameters": {
-                                    "temperature": runner.config.get('temperature', 0.7),
+                                   "temperature": runner.config.get('temperature', 0.0),
                                     "top_p": runner.config.get('top_p', 0.9),
                                     "max_tokens": runner.config.get('max_tokens', 2048)
                                 }
                             }
-                            # 元の入力にIDなどの追加情報がある場合は保持
-                            if 'id' in item:
-                                result_entry['id'] = item['id']
-                                
                             f.write(json.dumps(result_entry, ensure_ascii=False) + "\n")
+
+                            # 出力を次サイクルに渡す
+                            history.append({"role": "assistant", "content": output_text})
+
                 except Exception as e:
                     print(f"Error during experiment for {runner.name}: {e}")
                     continue
