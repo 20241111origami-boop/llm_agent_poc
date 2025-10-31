@@ -126,9 +126,9 @@ models:
 
   # --- 例2: Gemini API ---
   # GoogleのGemini APIを利用する場合の設定
-  - name: "Gemini-1.5-Flash"
+  - name: "Gemini-2.5-Flash"
     type: "gemini"
-    model: "gemini-1.5-flash" # Geminiのモデル名 (e.g., 'gemini-1.5-pro', 'gemini-1.0-pro')
+    model: "gemini-2.5-flash" # Geminiのモデル名 (e.g., 'gemini-2.5-pro', 'gemini-2.5-flash-lite')
     # 以下はオプションのパラメータ
     temperature: 0.8
     top_p: 0.95
@@ -155,5 +155,5 @@ cycles: 5
 inputs.jsonl
 
 {"id": "dialogue_1", "prompt": "AIの意識について、あなた自身の考えを述べてください。"}
-{"id": "dialogue_2", "prompt": "宇宙旅行が一般的になった未来の社会について、物語を創作してください。"}
+{"id": "dialogue_2", "prompt": "あなたは連続思考するエージェントです。自由に時間を使ってください。"}
 Please review these files. Let me know if you would like any changes or if you are happy with them.
